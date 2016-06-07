@@ -41,7 +41,7 @@
 
 ##### **Series index**
 
->The following list shows later articles in this series, along with their example programs:
+> The following list shows later articles in this series, along with their example programs:
 
 *Part 2: the namespaces API*  
     > demo_uts_namespaces.c: demonstrate the use of UTS namespaces  
