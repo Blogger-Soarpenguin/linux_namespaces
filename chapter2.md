@@ -1,5 +1,5 @@
 
-# # The namespaces API
+## Namespaces in operation,The namespaces API
 A namespace wraps a global system resource in an abstraction that makes it appear to the processes within the namespace that they have their own isolated instance of the resource. Namespaces are used for a variety of purposes, with the most notable being the implementation of containers, a technique for lightweight virtualization. This is the second part in a series of articles that looks in some detail at namespaces and the namespaces API. The first article in this series provided an overview of namespaces. This article looks at the namespaces API in some detail and shows the API in action in a number of example programs.
 
 The namespace API consists of three system calls—clone(), unshare(), and setns()—and a number of /proc files. In this article, we'll look at all of these system calls and some of the /proc files. In order to specify a namespace type on which to operate, the three system calls make use of the CLONE_NEW* constants listed in the previous article: CLONE_NEWIPC, CLONE_NEWNS, CLONE_NEWNET, CLONE_NEWPID, CLONE_NEWUSER, and CLONE_NEWUTS.
