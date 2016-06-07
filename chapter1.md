@@ -48,8 +48,8 @@
     > ns_exec.c: join a namespace using setns() and execute a command  
     > unshare.c: unshare namespaces and execute a command; similar in concept to unshare(1)  
 *Part 3: PID namespaces*  
-    pidns_init_sleep.c: demonstrate PID namespaces
-    multi_pidns.c: create a series of child processes in nested PID namespaces   
+    > pidns_init_sleep.c: demonstrate PID namespaces
+    > multi_pidns.c: create a series of child processes in nested PID namespaces   
 *Part 4: more on PID namespaces*  
     ns_child_exec.c: create a child process that executes a shell command in new namespace(s)
     simple_init.c: a simple init(1)-style program to be used as the init program in a PID namespace  
