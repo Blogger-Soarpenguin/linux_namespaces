@@ -4,7 +4,7 @@
 
 > The namespace API consists of three system calls—clone(), unshare(), and setns()—and a number of /proc files. In this article, we'll look at all of these system calls and some of the /proc files. In order to specify a namespace type on which to operate, the three system calls make use of the CLONE_NEW* constants listed in the previous article: CLONE_NEWIPC, CLONE_NEWNS, CLONE_NEWNET, CLONE_NEWPID, CLONE_NEWUSER, and CLONE_NEWUTS.
 
-> Creating a child in a new namespace: clone()
+Creating a child in a new namespace: clone()
 
 > One way of creating a namespace is via the use of clone(), a system call that creates a new process. For our purposes, clone() has the following prototype:
 
