@@ -9,7 +9,7 @@
 
 ##### **The namespaces**
 
-   Currently, Linux implements six different types of namespaces. The purpose of each namespace is to wrap a particular global system resource in an abstraction that makes it appear to the processes within the namespace that they have their own isolated instance of the global resource. One of the overall goals of namespaces is to support the implementation of containers, a tool for lightweight virtualization (as well as other purposes) that provides a group of processes with the illusion that they are the only processes on the system.
+  Currently, Linux implements six different types of namespaces. The purpose of each namespace is to wrap a particular global system resource in an abstraction that makes it appear to the processes within the namespace that they have their own isolated instance of the global resource. One of the overall goals of namespaces is to support the implementation of containers, a tool for lightweight virtualization (as well as other purposes) that provides a group of processes with the illusion that they are the only processes on the system.
 
    In the discussion below, we present the namespaces in the order that they were implemented (or at least, the order in which the implementations were completed). The CLONE_NEW* identifiers listed in parentheses are the names of the constants used to identify namespace types when employing the namespace-related APIs (clone(), unshare(), and setns()) that we will describe in our follow-on articles.
 
