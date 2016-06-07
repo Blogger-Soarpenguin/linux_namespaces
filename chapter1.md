@@ -51,13 +51,13 @@
     > pidns_init_sleep.c: demonstrate PID namespaces
     > multi_pidns.c: create a series of child processes in nested PID namespaces   
 *Part 4: more on PID namespaces*  
-    ns_child_exec.c: create a child process that executes a shell command in new namespace(s)
-    simple_init.c: a simple init(1)-style program to be used as the init program in a PID namespace  
-    orphan.c: demonstrate that a child becomes orphaned and is adopted by the init process when its parent exits  
-    ns_run.c: join one or more namespaces using setns() and execute a command in those namespaces, possibly inside a child process; similar in concept to nsenter(1)  
+    > ns_child_exec.c: create a child process that executes a shell command in new namespace(s)
+    > simple_init.c: a simple init(1)-style program to be used as the init program in a PID namespace  
+    > orphan.c: demonstrate that a child becomes orphaned and is adopted by the init process when its parent exits  
+    > ns_run.c: join one or more namespaces using setns() and execute a command in those namespaces, possibly inside a child process; similar in concept to nsenter(1)  
 *Part 5: user namespaces*   
-    demo_userns.c: simple program to create a user namespace and display process credentials and capabilities  
-    userns_child_exec.c: create a child process that executes a shell command in new namespace(s); similar to ns_child_exec.c, but with additional options for use with user namespaces  
+    > demo_userns.c: simple program to create a user namespace and display process credentials and capabilities  
+    > userns_child_exec.c: create a child process that executes a shell command in new namespace(s); similar to ns_child_exec.c, but with additional options for use with user namespaces  
 *Part 6: more on user namespaces*  
-    userns_setns_test.c: test the operation of setns() from two different user namespaces.  
+    > userns_setns_test.c: test the operation of setns() from two different user namespaces.  
 Part 7: network namespaces  
