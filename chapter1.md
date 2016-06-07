@@ -37,7 +37,7 @@
 
 ##### **Concluding remarks**
 
-   It's now around a decade since the implementation of the first Linux namespace. Since that time, the namespace concept has expanded into a more general framework for isolating a range of global resources whose scope was formerly system-wide. As a result, namespaces now provide the basis for a complete lightweight virtualization system, in the form of containers. As the namespace concept has expanded, the associated API has grown—from a single system call (clone()) and one or two /proc files—to include a number of other system calls and many more files under /proc. The details of that API will form the subject of the follow-ups to this article.
+> It's now around a decade since the implementation of the first Linux namespace. Since that time, the namespace concept has expanded into a more general framework for isolating a range of global resources whose scope was formerly system-wide. As a result, namespaces now provide the basis for a complete lightweight virtualization system, in the form of containers. As the namespace concept has expanded, the associated API has grown—from a single system call (clone()) and one or two /proc files—to include a number of other system calls and many more files under /proc. The details of that API will form the subject of the follow-ups to this article.
 
 ##### **Series index**
 
