@@ -55,7 +55,7 @@
 
 The /proc/PID/ns files
 
-Each process has a /proc/PID/ns directory that contains one file for each type of namespace. Starting in Linux 3.8, each of these files is a special symbolic link that provides a kind of handle for performing certain operations on the associated namespace for the process.
+> Each process has a /proc/PID/ns directory that contains one file for each type of namespace. Starting in Linux 3.8, each of these files is a special symbolic link that provides a kind of handle for performing certain operations on the associated namespace for the process.
 
     $ ls -l /proc/$$/ns         # $$ is replaced by shell's PID
     total 0
@@ -65,11 +65,11 @@ Each process has a /proc/PID/ns directory that contains one file for each type o
     lrwxrwxrwx. 1 mtk mtk 0 Jan  8 04:12 pid -> pid:[4026531836]
     lrwxrwxrwx. 1 mtk mtk 0 Jan  8 04:12 user -> user:[4026531837]
     lrwxrwxrwx. 1 mtk mtk 0 Jan  8 04:12 uts -> uts:[4026531838]
-One use of these symbolic links is to discover whether two processes are in the same namespace. The kernel does some magic to ensure that if two processes are in the same namespace, then the inode numbers reported for the corresponding symbolic links in /proc/PID/ns will be the same. The inode numbers can be obtained using the stat() system call (in the st_ino field of the returned structure).
+> One use of these symbolic links is to discover whether two processes are in the same namespace. The kernel does some magic to ensure that if two processes are in the same namespace, then the inode numbers reported for the corresponding symbolic links in /proc/PID/ns will be the same. The inode numbers can be obtained using the stat() system call (in the st_ino field of the returned structure).
 
-However, the kernel also constructs each of the /proc/PID/ns symbolic links so that it points to a name consisting of a string that identifies the namespace type, followed by the inode number. We can examine this name using either the ls -l or the readlink command.
+> However, the kernel also constructs each of the /proc/PID/ns symbolic links so that it points to a name consisting of a string that identifies the namespace type, followed by the inode number. We can examine this name using either the ls -l or the readlink command.
 
-Let's return to the shell session above where we ran the demo_uts_namespaces program. Looking at the /proc/PID/ns symbolic links for the parent and child process provides an alternative method of checking whether the two processes are in the same or different UTS namespaces:
+> Let's return to the shell session above where we ran the demo_uts_namespaces program. Looking at the /proc/PID/ns symbolic links for the parent and child process provides an alternative method of checking whether the two processes are in the same or different UTS namespaces:
 
     ^Z                                # Stop parent and child
     [1]+  Stopped          ./demo_uts_namespaces bizarro
@@ -79,39 +79,39 @@ Let's return to the shell session above where we ran the demo_uts_namespaces pro
     uts:[4026531838]
     # readlink /proc/27514/ns/uts     # Show child UTS namespace
     uts:[4026532338]
-As can be seen, the content of the /proc/PID/ns/uts symbolic links differs, indicating that the two processes are in different UTS namespaces.
+> As can be seen, the content of the /proc/PID/ns/uts symbolic links differs, indicating that the two processes are in different UTS namespaces.
 
-The /proc/PID/ns symbolic links also serve other purposes. If we open one of these files, then the namespace will continue to exist as long as the file descriptor remains open, even if all processes in the namespace terminate. The same effect can also be obtained by bind mounting one of the symbolic links to another location in the file system:
+> The /proc/PID/ns symbolic links also serve other purposes. If we open one of these files, then the namespace will continue to exist as long as the file descriptor remains open, even if all processes in the namespace terminate. The same effect can also be obtained by bind mounting one of the symbolic links to another location in the file system:
 
     # touch ~/uts                            # Create mount point
     # mount --bind /proc/27514/ns/uts ~/uts
-Before Linux 3.8, the files in /proc/PID/ns were hard links rather than special symbolic links of the form described above. In addition, only the ipc, net, and uts files were present.
+> Before Linux 3.8, the files in /proc/PID/ns were hard links rather than special symbolic links of the form described above. In addition, only the ipc, net, and uts files were present.
 
 Joining an existing namespace: setns()
 
-Keeping a namespace open when it contains no processes is of course only useful if we intend to later add processes to it. That is the task of the setns() system call, which allows the calling process to join an existing namespace:
+> Keeping a namespace open when it contains no processes is of course only useful if we intend to later add processes to it. That is the task of the setns() system call, which allows the calling process to join an existing namespace:
 
     int setns(int fd, int nstype);
-More precisely, setns() disassociates the calling process from one instance of a particular namespace type and reassociates the process with another instance of the same namespace type.
+> More precisely, setns() disassociates the calling process from one instance of a particular namespace type and reassociates the process with another instance of the same namespace type.
 
-The fd argument specifies the namespace to join; it is a file descriptor that refers to one of the symbolic links in a /proc/PID/ns directory. That file descriptor can be obtained either by opening one of those symbolic links directly or by opening a file that was bind mounted to one of the links.
+> The fd argument specifies the namespace to join; it is a file descriptor that refers to one of the symbolic links in a /proc/PID/ns directory. That file descriptor can be obtained either by opening one of those symbolic links directly or by opening a file that was bind mounted to one of the links.
 
-The nstype argument allows the caller to check the type of namespace that fd refers to. If this argument is specified as zero, no check is performed. This can be useful if the caller already knows the namespace type, or does not care about the type. The example program that we discuss in a moment (ns_exec.c) falls into the latter category: it is designed to work with any namespace type. Specifying nstype instead as one of the CLONE_NEW* constants causes the kernel to verify that fd is a file descriptor for the corresponding namespace type. This can be useful if, for example, the caller was passed the file descriptor via a UNIX domain socket and needs to verify what type of namespace it refers to.
+> The nstype argument allows the caller to check the type of namespace that fd refers to. If this argument is specified as zero, no check is performed. This can be useful if the caller already knows the namespace type, or does not care about the type. The example program that we discuss in a moment (ns_exec.c) falls into the latter category: it is designed to work with any namespace type. Specifying nstype instead as one of the CLONE_NEW* constants causes the kernel to verify that fd is a file descriptor for the corresponding namespace type. This can be useful if, for example, the caller was passed the file descriptor via a UNIX domain socket and needs to verify what type of namespace it refers to.
 
-Using setns() and execve() (or one of the other exec() functions) allows us to construct a simple but useful tool: a program that joins a specified namespace and then executes a command in that namespace.
+> Using setns() and execve() (or one of the other exec() functions) allows us to construct a simple but useful tool: a program that joins a specified namespace and then executes a command in that namespace.
 
-Our program (ns_exec.c, whose full source can be found here) takes two or more command-line arguments. The first argument is the pathname of a /proc/PID/ns/* symbolic link (or a file that is bind mounted to one of those symbolic links). The remaining arguments are the name of a program to be executed inside the namespace that corresponds to that symbolic link and optional command-line arguments to be given to that program. The key steps in the program are the following:
+> Our program (ns_exec.c, whose full source can be found here) takes two or more command-line arguments. The first argument is the pathname of a /proc/PID/ns/* symbolic link (or a file that is bind mounted to one of those symbolic links). The remaining arguments are the name of a program to be executed inside the namespace that corresponds to that symbolic link and optional command-line arguments to be given to that program. The key steps in the program are the following:
 
     fd = open(argv[1], O_RDONLY);   /* Get descriptor for namespace */
 
     setns(fd, 0);                   /* Join that namespace */
 
     execvp(argv[2], &argv[2]);      /* Execute a command in namespace */
-An interesting program to execute inside a namespace is, of course, a shell. We can use the bind mount for the UTS namespace that we created earlier in conjunction with the ns_exec program to execute a shell in the new UTS namespace created by our invocation of demo_uts_namespaces:
+> An interesting program to execute inside a namespace is, of course, a shell. We can use the bind mount for the UTS namespace that we created earlier in conjunction with the ns_exec program to execute a shell in the new UTS namespace created by our invocation of demo_uts_namespaces:
 
     # ./ns_exec ~/uts /bin/bash     # ~/uts is bound to /proc/27514/ns/uts
     My PID is: 28788
-We can then verify that the shell is in the same UTS namespace as the child process created by demo_uts_namespaces, both by inspecting the hostname and by comparing the inode numbers of the /proc/PID/ns/uts files:
+> We can then verify that the shell is in the same UTS namespace as the child process created by demo_uts_namespaces, both by inspecting the hostname and by comparing the inode numbers of the /proc/PID/ns/uts files:
 
     # hostname
     bizarro
@@ -119,28 +119,28 @@ We can then verify that the shell is in the same UTS namespace as the child proc
     uts:[4026532338]
     # readlink /proc/$$/ns/uts      # $$ is replaced by shell's PID
     uts:[4026532338]
-In earlier kernel versions, it was not possible to use setns() to join mount, PID, and user namespaces, but, starting with Linux 3.8, setns() now supports joining all namespace types.
+> In earlier kernel versions, it was not possible to use setns() to join mount, PID, and user namespaces, but, starting with Linux 3.8, setns() now supports joining all namespace types.
 
 Leaving a namespace: unshare()
 
-The final system call in the namespaces API is unshare():
+> The final system call in the namespaces API is unshare():
 
     int unshare(int flags);
-The unshare() system call provides functionality similar to clone(), but operates on the calling process: it creates the new namespaces specified by the CLONE_NEW* bits in its flags argument and makes the caller a member of the namespaces. (As with clone(), unshare() provides functionality beyond working with namespaces that we'll ignore here.) The main purpose of unshare() is to isolate namespace (and other) side effects without having to create a new process or thread (as is done by clone()).
+> The unshare() system call provides functionality similar to clone(), but operates on the calling process: it creates the new namespaces specified by the CLONE_NEW* bits in its flags argument and makes the caller a member of the namespaces. (As with clone(), unshare() provides functionality beyond working with namespaces that we'll ignore here.) The main purpose of unshare() is to isolate namespace (and other) side effects without having to create a new process or thread (as is done by clone()).
 
-Leaving aside the other effects of the clone() system call, a call of the form:
+> Leaving aside the other effects of the clone() system call, a call of the form:
 
     clone(..., CLONE_NEWXXX, ....);
-is roughly equivalent, in namespace terms, to the sequence:
+> is roughly equivalent, in namespace terms, to the sequence:
 
     if (fork() == 0)
         unshare(CLONE_NEWXXX);      /* Executed in the child process */
-One use of the unshare() system call is in the implementation of the unshare command, which allows the user to execute a command in a separate namespace from the shell. The general form of this command is:
+> One use of the unshare() system call is in the implementation of the unshare command, which allows the user to execute a command in a separate namespace from the shell. The general form of this command is:
 
-    unshare [options] program [arguments]
-The options are command-line flags that specify the namespaces to unshare before executing program with the specified arguments.
+>     unshare [options] program [arguments]
+> The options are command-line flags that specify the namespaces to unshare before executing program with the specified arguments.
 
-The key steps in the implementation of the unshare command are straightforward:
+> The key steps in the implementation of the unshare command are straightforward:
 
      /* Code to initialize 'flags' according to command-line options
         omitted */
@@ -151,9 +151,9 @@ The key steps in the implementation of the unshare command are straightforward:
         of the next command-line argument after options */
 
      execvp(argv[optind], &argv[optind]);
-A simple implementation of the unshare command (unshare.c) can be found here.
+> A simple implementation of the unshare command (unshare.c) can be found here.
 
-In the following shell session, we use our unshare.c program to execute a shell in a separate mount namespace. As we noted in last week's article, mount namespaces isolate the set of filesystem mount points seen by a group of processes, allowing processes in different mount namespaces to have different views of the filesystem hierarchy.
+> In the following shell session, we use our unshare.c program to execute a shell in a separate mount namespace. As we noted in last week's article, mount namespaces isolate the set of filesystem mount points seen by a group of processes, allowing processes in different mount namespaces to have different views of the filesystem hierarchy.
 
     # echo $$                             # Show PID of shell
     8490
@@ -164,16 +164,16 @@ In the following shell session, we use our unshare.c program to execute a shell 
     # ./unshare -m /bin/bash              # Start new shell in separate mount namespace
     # readlink /proc/$$/ns/mnt            # Show mount namespace ID 
     mnt:[4026532325]
-Comparing the output of the two readlink commands shows that the two shells are in separate mount namespaces. Altering the set of mount points in one of the namespaces and checking whether that change is visible in the other namespace provides another way of demonstrating that the two programs are in separate namespaces:
+> Comparing the output of the two readlink commands shows that the two shells are in separate mount namespaces. Altering the set of mount points in one of the namespaces and checking whether that change is visible in the other namespace provides another way of demonstrating that the two programs are in separate namespaces:
 
     # umount /dev/mqueue                  # Remove a mount point in this shell
     # cat /proc/$$/mounts | grep mq       # Verify that mount point is gone
     # cat /proc/8490/mounts | grep mq     # Is it still present in the other namespace?
     mqueue /dev/mqueue mqueue rw,seclabel,relatime 0 0
-As can be seen from the output of the last two commands, the /dev/mqueue mount point has disappeared in one mount namespace, but continues to exist in the other.
+> As can be seen from the output of the last two commands, the /dev/mqueue mount point has disappeared in one mount namespace, but continues to exist in the other.
 
 Concluding remarks
 
-In this article we've looked at the fundamental pieces of the namespace API and how they are employed together. In the follow-on articles, we'll look in more depth at some other namespaces, in particular, the PID and user namespaces; user namespaces open up a range of new possibilities for applications to use kernel interfaces that were formerly restricted to privileged applications.
+> In this article we've looked at the fundamental pieces of the namespace API and how they are employed together. In the follow-on articles, we'll look in more depth at some other namespaces, in particular, the PID and user namespaces; user namespaces open up a range of new possibilities for applications to use kernel interfaces that were formerly restricted to privileged applications.
 
 
