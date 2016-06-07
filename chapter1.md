@@ -43,11 +43,11 @@
 
 The following list shows later articles in this series, along with their example programs:
 
-*Part 2: the namespaces API*
-    demo_uts_namespaces.c: demonstrate the use of UTS namespaces
-    ns_exec.c: join a namespace using setns() and execute a command
-    unshare.c: unshare namespaces and execute a command; similar in concept to unshare(1)
-*Part 3: PID namespaces*
+*Part 2: the namespaces API*  
+    demo_uts_namespaces.c: demonstrate the use of UTS namespaces  
+    ns_exec.c: join a namespace using setns() and execute a command  
+    unshare.c: unshare namespaces and execute a command; similar in concept to unshare(1)  
+*Part 3: PID namespaces*  
     pidns_init_sleep.c: demonstrate PID namespaces
     multi_pidns.c: create a series of child processes in nested PID namespaces
 *Part 4: more on PID namespaces*
