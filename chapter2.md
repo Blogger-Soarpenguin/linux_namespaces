@@ -1,21 +1,21 @@
 
 ## Namespaces in operation,the namespaces API
-A namespace wraps a global system resource in an abstraction that makes it appear to the processes within the namespace that they have their own isolated instance of the resource. Namespaces are used for a variety of purposes, with the most notable being the implementation of containers, a technique for lightweight virtualization. This is the second part in a series of articles that looks in some detail at namespaces and the namespaces API. The first article in this series provided an overview of namespaces. This article looks at the namespaces API in some detail and shows the API in action in a number of example programs.
+> A namespace wraps a global system resource in an abstraction that makes it appear to the processes within the namespace that they have their own isolated instance of the resource. Namespaces are used for a variety of purposes, with the most notable being the implementation of containers, a technique for lightweight virtualization. This is the second part in a series of articles that looks in some detail at namespaces and the namespaces API. The first article in this series provided an overview of namespaces. This article looks at the namespaces API in some detail and shows the API in action in a number of example programs.
 
-The namespace API consists of three system calls—clone(), unshare(), and setns()—and a number of /proc files. In this article, we'll look at all of these system calls and some of the /proc files. In order to specify a namespace type on which to operate, the three system calls make use of the CLONE_NEW* constants listed in the previous article: CLONE_NEWIPC, CLONE_NEWNS, CLONE_NEWNET, CLONE_NEWPID, CLONE_NEWUSER, and CLONE_NEWUTS.
+> The namespace API consists of three system calls—clone(), unshare(), and setns()—and a number of /proc files. In this article, we'll look at all of these system calls and some of the /proc files. In order to specify a namespace type on which to operate, the three system calls make use of the CLONE_NEW* constants listed in the previous article: CLONE_NEWIPC, CLONE_NEWNS, CLONE_NEWNET, CLONE_NEWPID, CLONE_NEWUSER, and CLONE_NEWUTS.
 
-Creating a child in a new namespace: clone()
+> Creating a child in a new namespace: clone()
 
-One way of creating a namespace is via the use of clone(), a system call that creates a new process. For our purposes, clone() has the following prototype:
+> One way of creating a namespace is via the use of clone(), a system call that creates a new process. For our purposes, clone() has the following prototype:
 
     int clone(int (*child_func)(void *), void *child_stack, int flags, void *arg);
-Essentially, clone() is a more general version of the traditional UNIX fork() system call whose functionality can be controlled via the flags argument. In all, there are more than twenty different CLONE_* flags that control various aspects of the operation of clone(), including whether the parent and child process share resources such as virtual memory, open file descriptors, and signal dispositions. If one of the CLONE_NEW* bits is specified in the call, then a new namespace of the corresponding type is created, and the new process is made a member of that namespace; multiple CLONE_NEW* bits can be specified in flags.
+> Essentially, clone() is a more general version of the traditional UNIX fork() system call whose functionality can be controlled via the flags argument. In all, there are more than twenty different CLONE_* flags that control various aspects of the operation of clone(), including whether the parent and child process share resources such as virtual memory, open file descriptors, and signal dispositions. If one of the CLONE_NEW* bits is specified in the call, then a new namespace of the corresponding type is created, and the new process is made a member of that namespace; multiple CLONE_NEW* bits can be specified in flags.
 
-Our example program (demo_uts_namespace.c) uses clone() with the CLONE_NEWUTS flag to create a UTS namespace. As we saw last week, UTS namespaces isolate two system identifiers—the hostname and the NIS domain name—that are set using the sethostname() and setdomainname() system calls and returned by the uname() system call. You can find the full source of the program here. Below, we'll focus on just some of the key pieces of the program (and for brevity, we'll omit the error checking code that is present in the full version of the program).
+> Our example program (demo_uts_namespace.c) uses clone() with the CLONE_NEWUTS flag to create a UTS namespace. As we saw last week, UTS namespaces isolate two system identifiers—the hostname and the NIS domain name—that are set using the sethostname() and setdomainname() system calls and returned by the uname() system call. You can find the full source of the program here. Below, we'll focus on just some of the key pieces of the program (and for brevity, we'll omit the error checking code that is present in the full version of the program).
 
-The example program takes one command-line argument. When run, it creates a child that executes in a new UTS namespace. Inside that namespace, the child changes the hostname to the string given as the program's command-line argument.
+> The example program takes one command-line argument. When run, it creates a child that executes in a new UTS namespace. Inside that namespace, the child changes the hostname to the string given as the program's command-line argument.
 
-The first significant piece of the main program is the clone() call that creates the child process:
+> The first significant piece of the main program is the clone() call that creates the child process:
 
     child_pid = clone(childFunc, 
                       child_stack + STACK_SIZE,   /* Points to start of 
@@ -23,23 +23,23 @@ The first significant piece of the main program is the clone() call that creates
                       CLONE_NEWUTS | SIGCHLD, argv[1]);
 
     printf("PID of child created by clone() is %ld\n", (long) child_pid);
-The new child will begin execution in the user-defined function childFunc(); that function will receive the final clone() argument (argv[1]) as its argument. Since CLONE_NEWUTS is specified as part of the flags argument, the child will execute in a newly created UTS namespace.
+> The new child will begin execution in the user-defined function childFunc(); that function will receive the final clone() argument (argv[1]) as its argument. Since CLONE_NEWUTS is specified as part of the flags argument, the child will execute in a newly created UTS namespace.
 
-The main program then sleeps for a moment. This is a (crude) way of giving the child time to change the hostname in its UTS namespace. The program then uses uname() to retrieve the host name in the parent's UTS namespace, and displays that hostname:
+> The main program then sleeps for a moment. This is a (crude) way of giving the child time to change the hostname in its UTS namespace. The program then uses uname() to retrieve the host name in the parent's UTS namespace, and displays that hostname:
 
     sleep(1);           /* Give child time to change its hostname */
 
     uname(&uts);
     printf("uts.nodename in parent: %s\n", uts.nodename);
-Meanwhile, the childFunc() function executed by the child created by clone() first changes the hostname to the value supplied in its argument, and then retrieves and displays the modified hostname:
+> Meanwhile, the childFunc() function executed by the child created by clone() first changes the hostname to the value supplied in its argument, and then retrieves and displays the modified hostname:
 
     sethostname(arg, strlen(arg);
     
     uname(&uts);
     printf("uts.nodename in child:  %s\n", uts.nodename);
-Before terminating, the child sleeps for a while. This has the effect of keeping the child's UTS namespace open, and gives us a chance to conduct some of the experiments that we show later.
+> Before terminating, the child sleeps for a while. This has the effect of keeping the child's UTS namespace open, and gives us a chance to conduct some of the experiments that we show later.
 
-Running the program demonstrates that the parent and child processes have independent UTS namespaces:
+> Running the program demonstrates that the parent and child processes have independent UTS namespaces:
 
     $ su                   # Need privilege to create a UTS namespace
     Password: 
@@ -49,9 +49,9 @@ Running the program demonstrates that the parent and child processes have indepe
     PID of child created by clone() is 27514
     uts.nodename in child:  bizarro
     uts.nodename in parent: antero
-As with most other namespaces (user namespaces are the exception), creating a UTS namespace requires privilege (specifically, CAP_SYS_ADMIN). This is necessary to avoid scenarios where set-user-ID applications could be fooled into doing the wrong thing because the system has an unexpected hostname.
+> As with most other namespaces (user namespaces are the exception), creating a UTS namespace requires privilege (specifically, CAP_SYS_ADMIN). This is necessary to avoid scenarios where set-user-ID applications could be fooled into doing the wrong thing because the system has an unexpected hostname.
 
-Another possibility is that a set-user-ID application might be using the hostname as part of the name of a lock file. If an unprivileged user could run the application in a UTS namespace with an arbitrary hostname, this would open the application to various attacks. Most simply, this would nullify the effect of the lock file, triggering misbehavior in instances of the application that run in different UTS namespaces. Alternatively, a malicious user could run a set-user-ID application in a UTS namespace with a hostname that causes creation of the lock file to overwrite an important file. (Hostname strings can contain arbitrary characters, including slashes.)
+> Another possibility is that a set-user-ID application might be using the hostname as part of the name of a lock file. If an unprivileged user could run the application in a UTS namespace with an arbitrary hostname, this would open the application to various attacks. Most simply, this would nullify the effect of the lock file, triggering misbehavior in instances of the application that run in different UTS namespaces. Alternatively, a malicious user could run a set-user-ID application in a UTS namespace with a hostname that causes creation of the lock file to overwrite an important file. (Hostname strings can contain arbitrary characters, including slashes.)
 
 The /proc/PID/ns files
 
