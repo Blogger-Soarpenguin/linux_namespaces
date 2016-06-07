@@ -61,4 +61,4 @@
     > userns_child_exec.c: create a child process that executes a shell command in new namespace(s); similar to ns_child_exec.c, but with additional options for use with user namespaces  
 *Part 6: more on user namespaces*  
     > userns_setns_test.c: test the operation of setns() from two different user namespaces.  
-Part 7: network namespaces  
+*Part 7: network namespaces  *
