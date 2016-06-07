@@ -4,7 +4,7 @@
 
 > The namespace API consists of three system calls—clone(), unshare(), and setns()—and a number of /proc files. In this article, we'll look at all of these system calls and some of the /proc files. In order to specify a namespace type on which to operate, the three system calls make use of the CLONE_NEW* constants listed in the previous article: CLONE_NEWIPC, CLONE_NEWNS, CLONE_NEWNET, CLONE_NEWPID, CLONE_NEWUSER, and CLONE_NEWUTS.
 
-Creating a child in a new namespace: clone()
+*Creating a child in a new namespace: clone()*
 
 > One way of creating a namespace is via the use of clone(), a system call that creates a new process. For our purposes, clone() has the following prototype:
 
@@ -53,7 +53,7 @@ Creating a child in a new namespace: clone()
 
 > Another possibility is that a set-user-ID application might be using the hostname as part of the name of a lock file. If an unprivileged user could run the application in a UTS namespace with an arbitrary hostname, this would open the application to various attacks. Most simply, this would nullify the effect of the lock file, triggering misbehavior in instances of the application that run in different UTS namespaces. Alternatively, a malicious user could run a set-user-ID application in a UTS namespace with a hostname that causes creation of the lock file to overwrite an important file. (Hostname strings can contain arbitrary characters, including slashes.)
 
-The /proc/PID/ns files
+*The /proc/PID/ns files*
 
 > Each process has a /proc/PID/ns directory that contains one file for each type of namespace. Starting in Linux 3.8, each of these files is a special symbolic link that provides a kind of handle for performing certain operations on the associated namespace for the process.
 
@@ -87,7 +87,7 @@ The /proc/PID/ns files
     # mount --bind /proc/27514/ns/uts ~/uts
 > Before Linux 3.8, the files in /proc/PID/ns were hard links rather than special symbolic links of the form described above. In addition, only the ipc, net, and uts files were present.
 
-Joining an existing namespace: setns()
+*Joining an existing namespace: setns()*
 
 > Keeping a namespace open when it contains no processes is of course only useful if we intend to later add processes to it. That is the task of the setns() system call, which allows the calling process to join an existing namespace:
 
@@ -121,7 +121,7 @@ Joining an existing namespace: setns()
     uts:[4026532338]
 > In earlier kernel versions, it was not possible to use setns() to join mount, PID, and user namespaces, but, starting with Linux 3.8, setns() now supports joining all namespace types.
 
-Leaving a namespace: unshare()
+*Leaving a namespace: unshare()*
 
 > The final system call in the namespaces API is unshare():
 
