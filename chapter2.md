@@ -53,7 +53,7 @@
 
 > Another possibility is that a set-user-ID application might be using the hostname as part of the name of a lock file. If an unprivileged user could run the application in a UTS namespace with an arbitrary hostname, this would open the application to various attacks. Most simply, this would nullify the effect of the lock file, triggering misbehavior in instances of the application that run in different UTS namespaces. Alternatively, a malicious user could run a set-user-ID application in a UTS namespace with a hostname that causes creation of the lock file to overwrite an important file. (Hostname strings can contain arbitrary characters, including slashes.)
 
-*The /proc/PID/ns files*
+> The /proc/PID/ns files
 
 > Each process has a /proc/PID/ns directory that contains one file for each type of namespace. Starting in Linux 3.8, each of these files is a special symbolic link that provides a kind of handle for performing certain operations on the associated namespace for the process.
 
