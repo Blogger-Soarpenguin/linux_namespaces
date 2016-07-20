@@ -1,5 +1,5 @@
 
-## Namespaces in operation,namespaces overview
+## Namespaces overview
 
 > The Linux 3.8 merge window saw the acceptance of Eric Biederman's sizeable series of user namespace and related patches. Although there remain some details to finish—for example, a number of Linux filesystems are not yet user-namespace aware—the implementation of user namespaces is now functionally complete.
 
